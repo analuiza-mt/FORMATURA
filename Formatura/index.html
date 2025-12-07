@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Formatura • Contagem Regressiva</title>
+
+<!-- ===== CSS ===== -->
+<style>
+  :root{
+    --gold: #ffd369;
+    --dark-1: #050505;
+    --dark-2: #121212;
+    --glass: rgba(255,255,255,0.06);
+  }
+
+  /* Reset básico */
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+
+  body {
+    font-family: "Poppins", "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(180deg,var(--dark-1),var(--dark-2));
+    color: #fff;
+    overflow: hidden;
+    -webkit-font-smoothing:antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Cabeçalho */
+  header {
+    position: relative;
+    z-index: 30;
+    padding: 24px 18px 6px;
+    text-align: center;
+  }
+  h1 {
+    font-size: clamp(20px,4vw,38px);
+    letter-spacing: 1px;
+    color: white;
+    text-shadow: 0 0 14px rgba(255,215,0,0.15), 0 2px 12px rgba(0,0,0,0.6);
+  }
+
+  /* Contador */
+  #countdown {
+    margin-top:10px;
+    font-size: clamp(14px,2.2vw,22px);
+    color: var(--gold);
+    text-shadow: 0 0 10px rgba(255,215,0,0.12);
+  }
+
+  /* Mensagem nostalgia */
+  #nostalgia {
+    margin-top:10px;
+    font-size: clamp(12px,1.6vw,18px);
+    color: rgba(255,211,105,0.95);
+    opacity: 0.95;
+  }
+
+  /* Linha horizontal de fotos (scroller) */
+  .photo-strip-wrap{
+    position: absolute;
+    left:0;
+    right:0;
+    bottom:18vh; /* ajustar verticalmente */
+    z-index:20;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .horizontal-scroll{
+    display:flex;
+    gap:22px;
+    align-items:center;
+    padding:12px 0;
+    will-change: transform;
+    animation: scroll-left 34s linear infinite;
+  }
+
+  @keyframes scroll-left {
+    0%   { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* Foto */
+  .photo {
+    width: 160px;
+    height: 160px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 3px solid rgba(255,215,0,0.9);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 18px rgba(255,215,0,0.06);
+    transform-origin: center;
+    transition: transform .35s ease, filter .35s ease;
+    pointer-events: auto; /* caso queira clicar depois */
+  }
+
+  .photo:hover {
+    transform: scale(1.06) rotate(-1deg);
+    filter: saturate(1.06);
+  }
+
+  /* Duplicação visual do fluxo: duplicamos o conteúdo via JS,
+     o container tem 200% de largura implícita e movemos -50% na animação
+     para criar loop contínuo suave. */
+
+  /* Partículas douradas (fundo) */
+  .particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: radial-gradient(circle at 30% 30%, #fff9d6, gold);
+    border-radius: 50%;
+    opacity: 0.85;
+    z-index: 10;
+    pointer-events: none;
+  }
+/* Responsividade */
+  @media (max-width:720px){
+    .photo { width:120px; height:120px; border-radius:10px }
+    .photo-strip-wrap{ bottom:14vh }
+    header{ padding-top:14px }
+  }
+
+  /* Área que contém a faixa de fotos */
+.photo-strip-wrap {
+    position: absolute;
+    bottom: -1vh; /* empurra o carrossel muito mais para baixo */
+    width: 100%;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* A faixa que se move */
+.photo-strip {
+    display: flex;
+    gap: 25px;
+    width: max-content;
+    animation: move-left 25s linear infinite;
+}
+
+/* Animação infinita suave */
+@keyframes move-left {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/* Foto estilizada */
+.photo {
+    width: 160px;
+    height: 160px;
+    border-radius: 15px;
+    object-fit: cover;
+    border: 3px solid rgba(255, 215, 0, 0.8);
+    box-shadow: 0 0 15px gold, 0 0 30px rgba(255, 215, 0, 0.4);
+}
+
+.foto-central {
+    display: block;
+    margin: 30px auto 120px auto; /* AQUI aumenta o espaço para 120px */
+    width: 60%;
+    max-width: 450px;
+    height: auto;
+    border-radius: 20px;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.25);
+}
+
+.slider {
+    margin-top: 40px; /* empurra o carrossel para baixo */
+}
+
+</style>
+</head>
+<body>
+
+<!-- Player invisível do YouTube -->
+<iframe 
+    width="0" 
+    height="0" 
+    src="https://www.youtube.com/embed/4InSuadZzIU?autoplay=1&loop=1&playlist=4InSuadZzIU" 
+    frameborder="0" 
+    allow="autoplay; encrypted-media" 
+    allowfullscreen
+></iframe>
+
+
+<header>
+  <h1>✨ Contagem Regressiva — Formatura</h1>
+  <div id="countdown">Carregando...</div>
+  <div id="nostalgia">Entre lembranças e sonhos, agora só falta a gente no grande dia🎓</div>
+</header>
+
+<img class="foto-central" src="fotos/fotos 11.jpeg">
+
+<!-- Lista horizontal que será preenchida por JS -->
+<div class="photo-strip-wrap">
+  <div id="photoStrip" class="horizontal-scroll" aria-hidden="true"></div>
+</div>
+
+<!-- Partículas (criado por JS) -->
+<!-- Música de fundo: troque por seu arquivo 'musica.mp3' -->
+<audio id="bgm" autoplay loop>
+  <source src="musica.mp3" type="audio/mpeg">
+  <!-- Se o navegador bloquear autoplay, usuário pode clicar para tocar -->
+</audio>
+
+<!-- ===== JS ===== -->
+<script>
+  /* ---------- CONTAGEM REGRESSIVA ---------- */
+  // Data: 21 de janeiro de 2026, às 20:00 (ajuste o horário se precisar)
+  const formatura = new Date("2026-01-21T20:00:00-03:00"); // fuso America/Sao_Paulo (-03)
+  const elCountdown = document.getElementById('countdown');
+
+  function formatTwo(n){ return String(n).padStart(2,'0'); }
+
+  function atualizarCountdown(){
+    const agora = new Date();
+    let diff = formatura - agora;
+    if (diff <= 0){
+      elCountdown.textContent = "🎓 É HOJE! FELIZ FORMATURA! 🎓";
+      return;
+    }
+    const dias = Math.floor(diff / (1000*60*60*24));
+    const horas = Math.floor((diff / (1000*60*60)) % 24);
+    const minutos = Math.floor((diff / (1000*60)) % 60);
+    const segundos = Math.floor((diff / 1000) % 60);
+
+    elCountdown.textContent = `${dias} dias • ${formatTwo(horas)}h • ${formatTwo(minutos)}m • ${formatTwo(segundos)}s`;
+  }
+  atualizarCountdown();
+  setInterval(atualizarCountdown, 1000);
+
+  /* ---------- BARRA HORIZONTAL DE FOTOS (SCROLLER) ---------- */
+  // Lista de imagens — substitua pelos nomes dos seus arquivos
+  const fotos = [
+    "fotos/fotos 1.jpg","fotos/fotos 2.jpg","fotos/fotos 3.jpg","fotos/fotos 4.jpg",
+    "fotos/fotos 5.jpg","fotos/fotos 6.jpg","fotos/fotos 7.jpg","fotos/fotos 8.jpg", "fotos/fotos 9.jpg"
+  ];
+
+  const strip = document.getElementById('photoStrip');
+
+  // Função que cria <img> com classe .photo
+  function criarImg(src){
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = "Foto da turma";
+    img.className = "photo";
+    return img;
+  }
+
+  // Coloca duas cópias das fotos para criar efeito de loop contínuo
+  (function popularStrip(){
+    // verifica se há imagens — se não, cria placeholders
+    const hasFiles = fotos.length > 0 && fotos[0] !== "";
+    let list = hasFiles ? fotos.slice() : [];
+
+    if (!hasFiles){
+      // cria placeholders simples (gradiente) visuais caso não haja imagens
+      for (let i=0;i<8;i++){
+        const placeholder = document.createElement('div');
+        placeholder.className = 'photo';
+        placeholder.style.background = 'linear-gradient(135deg,#2b2b2b,#111)';
+        placeholder.style.display = 'inline-block';
+        placeholder.style.minWidth = '160px';
+        placeholder.style.minHeight = '160px';
+        strip.appendChild(placeholder);
+      }
+    } else {
+      // inserir duas vezes
+      const listaDup = list.concat(list);
+      listaDup.forEach(src => strip.appendChild(criarImg(src)));
+    }
+    // ajustar largura implícita: para animação funcionar suavemente, remover gaps do final
+  })();
+
+  /* ---------- PARTÍCULAS DOURADAS ---------- */
+  function criarParticula(){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = 4 + Math.random()*6;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.left = Math.random()*100 + 'vw';
+    p.style.top = 100 + 'vh'; // começam abaixo da tela
+    p.style.opacity = 0.5 + Math.random()*0.6;
+    p.style.transform = `translateY(0)`;
+    p.style.transition = 'transform linear, opacity linear';
+    document.body.appendChild(p);
+
+    // anima para cima com duração aleatória
+    const dur = 3500 + Math.random()*4000;
+    // força reflow e aplica transform
+    requestAnimationFrame(() => {
+      p.style.transitionDuration = dur + 'ms';
+      p.style.transform = `translateY(-130vh) translateX(${(Math.random()-0.5)*20}vw)`;
+      p.style.opacity = 0;
+    });
+
+    setTimeout(()=> p.remove(), dur + 100);
+  }
+
+  // criar partículas periodicamente (ajuste o intervalo se ficar pesado)
+  setInterval(criarParticula, 220);
+</script>
+</body>
+</html>
